@@ -52,13 +52,25 @@ steps:
     artifactName: 'challenge-artifact'
 
 - task: AzureRmWebAppDeployment@4
-  displayName: 'Deploy Web App PRD'
+  displayName: 'Deploy Web App Staging'
   inputs:
     ConnectionType: 'AzureRM'
     azureSubscription: 'Avaliação Gratuita'
     appType: 'webApp'
     WebAppName: 'challange'
+    deployToSlotOrASE: true
+    ResourceGroupName: 'DevOpsChallange'
+    SlotName: 'Staging'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
     enableCustomDeployment: true
     DeploymentType: 'zipDeploy'
     TakeAppOfflineFlag: false
+
+- task: AzureAppServiceManage@0
+  displayName: 'Swap to PRD'
+  inputs:
+    azureSubscription: 'Avaliação Gratuita'
+    Action: 'Swap Slots'
+    WebAppName: 'challange'
+    ResourceGroupName: 'DevOpsChallange'
+    SourceSlot: 'Teste'
