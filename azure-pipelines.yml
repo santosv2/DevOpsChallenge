@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+-
 
 pool:
   vmImage: 'windows-latest'
@@ -39,6 +39,12 @@ steps:
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'challenge'
+
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Avaliação Gratuita(cc9bd8a5-9fec-4a99-b9b3-b21a55b3476d)'
