@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
--
+- master
 
 pool:
   vmImage: 'windows-latest'
@@ -40,26 +40,16 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
-    includeRootFolder: true
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
     
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'challenge'
+    artifactName: 'challenge-artifact'
 
-- task: AzureWebApp@1
+- task: AzureRmWebAppDeployment@4
   inputs:
+    ConnectionType: 'AzureRM'
     azureSubscription: 'Avaliação Gratuita(cc9bd8a5-9fec-4a99-b9b3-b21a55b3476d)'
     appType: 'webApp'
-    appName: 'challange'
-    deployToSlotOrASE: true
-    resourceGroupName: 'DevOpsChallange'
-    slotName: 'Teste'
-    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-    deploymentMethod: 'auto'
+    WebAppName: 'challange'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
