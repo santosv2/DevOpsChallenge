@@ -61,5 +61,5 @@ steps:
     deployToSlotOrASE: true
     resourceGroupName: 'DevOpsChallange'
     slotName: 'Teste'
-    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
     deploymentMethod: 'auto'
