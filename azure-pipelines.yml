@@ -18,10 +18,12 @@ steps:
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
+  displayName: 'NuGet Restore'
   inputs:
     restoreSolution: '$(solution)'
 
 - task: VSBuild@1
+  displayName: 'Build'
   inputs:
     solution: '$(solution)'
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
@@ -29,11 +31,13 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - task: VSTest@2
+  displayName: 'Test'
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish'
   inputs:
     command: publish
     publishWebProjects: True
@@ -42,14 +46,19 @@ steps:
 
     
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'challenge-artifact'
 
 - task: AzureRmWebAppDeployment@4
+  displayName: 'Deploy Web App PRD'
   inputs:
     ConnectionType: 'AzureRM'
     azureSubscription: 'Avaliação Gratuita(cc9bd8a5-9fec-4a99-b9b3-b21a55b3476d)'
     appType: 'webApp'
     WebAppName: 'challange'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: 'zipDeploy'
+    TakeAppOfflineFlag: false
