@@ -1,57 +1,60 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+- qa
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: Restore 
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  displayName: 'NuGet Restore'
   inputs:
-    command: restore
-    projects: 'src/**/*.csproj'
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  displayName: 'Build'
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  displayName: 'Test'
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: Building
-  inputs:
-    projects: '**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
-    workingDirectory: src
-
-- task: DotNetCoreCLI@2
-  displayName: Testing
-  inputs:
-    command: test
-    projects: |
-     **/*[Tt]ests.*/*.csproj
-    arguments: '--configuration $(BuildConfiguration)'
-    workingDirectory: src
-
-- task: DotNetCoreCLI@2
-  displayName: Publish
+  displayName: 'Publish'
   inputs:
     command: publish
     publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'challenge-artifact'
 
 - task: AzureRmWebAppDeployment@4
+  displayName: 'Deploy Web App Test'
   inputs:
     ConnectionType: 'AzureRM'
-    azureSubscription: 'Avaliação Gratuita(cc9bd8a5-9fec-4a99-b9b3-b21a55b3476d)'
+    azureSubscription: 'Avaliação Gratuita'
     appType: 'webApp'
     WebAppName: 'challange'
     deployToSlotOrASE: true
@@ -61,3 +64,7 @@ steps:
     enableCustomDeployment: true
     DeploymentType: 'zipDeploy'
     TakeAppOfflineFlag: false
+
+
+
+# Utilizando os release pipelines da azure é possivel elaborar um pipeline mais robusto para deploy utilizando de fluxos de aprovações e criação de pull requests automaticos, porem não disponibiliza um arquivo yml
