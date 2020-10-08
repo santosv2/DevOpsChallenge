@@ -55,7 +55,7 @@ steps:
   displayName: 'Deploy Web App PRD'
   inputs:
     ConnectionType: 'AzureRM'
-    azureSubscription: 'Avaliação Gratuita(cc9bd8a5-9fec-4a99-b9b3-b21a55b3476d)'
+    azureSubscription: 'Avaliação Gratuita'
     appType: 'webApp'
     WebAppName: 'challange'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
