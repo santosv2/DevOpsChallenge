@@ -73,4 +73,4 @@ steps:
     Action: 'Swap Slots'
     WebAppName: 'challange'
     ResourceGroupName: 'DevOpsChallange'
-    SourceSlot: 'Teste'
+    SourceSlot: 'Staging'
